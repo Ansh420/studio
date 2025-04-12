@@ -4,8 +4,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -25,6 +23,13 @@ import {Toaster} from '@/components/ui/toaster';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Home, Terminal} from 'lucide-react';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import {generatePracticeScenario} from '@/ai/flows/hacking-practice';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 const mockArticles: NewsArticle[] = [
   {
@@ -38,6 +43,63 @@ const mockArticles: NewsArticle[] = [
     publicationDate: '2024-01-02T00:00:00.000Z',
   },
 ];
+
+const HackingPractice = () => {
+  const [scenario, setScenario] = useState<any>(null);
+  const {toast} = useToast();
+
+  const handleGenerateScenario = async () => {
+    try {
+      const practiceScenario = await generatePracticeScenario({
+        skillLevel: 'Beginner',
+        topic: 'SQL injection',
+      });
+      setScenario(practiceScenario);
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Error generating scenario',
+        description: error.message,
+      });
+    }
+  };
+
+  return (
+    <div>
+      <h2 className="text-xl font-bold mb-4">Hacking Practice</h2>
+      <Button onClick={handleGenerateScenario}>Generate Practice Scenario</Button>
+
+      {scenario && (
+        <Card className="mt-4">
+          <CardHeader>
+            <CardTitle>Scenario</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p>{scenario.scenarioDescription}</p>
+            <Accordion type="single" collapsible className="w-full mt-4">
+              <AccordionItem value="hints">
+                <AccordionTrigger>Hints</AccordionTrigger>
+                <AccordionContent>
+                  <ul>
+                    {scenario.hints.map((hint: any, index: number) => (
+                      <li key={index}>{hint}</li>
+                    ))}
+                  </ul>
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="solution">
+                <AccordionTrigger>Solution</AccordionTrigger>
+                <AccordionContent>
+                  <p>{scenario.solution}</p>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+};
 
 export default function DailyNewsPage() {
   const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
@@ -114,6 +176,7 @@ export default function DailyNewsPage() {
                   <TabsTrigger value="news">News</TabsTrigger>
                   <TabsTrigger value="research">Research</TabsTrigger>
                   <TabsTrigger value="latest">Latest News</TabsTrigger>
+                  <TabsTrigger value="hacking">Hacking Practice</TabsTrigger>
                 </TabsList>
                 <TabsContent value="news">
                   {newsArticles.length > 0 ? (
@@ -165,6 +228,9 @@ export default function DailyNewsPage() {
                   ) : (
                     <p>Loading latest articles...</p>
                   )}
+                </TabsContent>
+                <TabsContent value="hacking">
+                  <HackingPractice/>
                 </TabsContent>
               </Tabs>
             </div>
