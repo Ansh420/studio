@@ -44,68 +44,12 @@ const mockArticles: NewsArticle[] = [
   },
 ];
 
-const HackingPractice = () => {
-  const [scenario, setScenario] = useState<any>(null);
-  const {toast} = useToast();
-
-  const handleGenerateScenario = async () => {
-    try {
-      const practiceScenario = await generatePracticeScenario({
-        skillLevel: 'Beginner',
-        topic: 'SQL injection',
-      });
-      setScenario(practiceScenario);
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Error generating scenario',
-        description: error.message,
-      });
-    }
-  };
-
-  return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Hacking Practice</h2>
-      <Button onClick={handleGenerateScenario}>Generate Practice Scenario</Button>
-
-      {scenario && (
-        <Card className="mt-4">
-          <CardHeader>
-            <CardTitle>Scenario</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>{scenario.scenarioDescription}</p>
-            <Accordion type="single" collapsible className="w-full mt-4">
-              <AccordionItem value="hints">
-                <AccordionTrigger>Hints</AccordionTrigger>
-                <AccordionContent>
-                  <ul>
-                    {scenario.hints.map((hint: any, index: number) => (
-                      <li key={index}>{hint}</li>
-                    ))}
-                  </ul>
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="solution">
-                <AccordionTrigger>Solution</AccordionTrigger>
-                <AccordionContent>
-                  <p>{scenario.solution}</p>
-                </AccordionContent>
-              </AccordionItem>
-            </Accordion>
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-};
-
 export default function DailyNewsPage() {
   const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
   const [researchArticles, setResearchArticles] = useState<NewsArticle[]>(mockArticles);
   const [latestArticles, setLatestArticles] = useState<NewsArticle[]>(mockArticles);
   const {toast} = useToast();
+  const [scenario, setScenario] = useState<any>(null);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -129,6 +73,22 @@ export default function DailyNewsPage() {
       toast({
         variant: 'destructive',
         title: 'Error summarizing article',
+        description: error.message,
+      });
+    }
+  };
+
+  const handleGenerateScenario = async () => {
+    try {
+      const practiceScenario = await generatePracticeScenario({
+        skillLevel: 'Beginner',
+        topic: 'SQL injection',
+      });
+      setScenario(practiceScenario);
+    } catch (error: any) {
+      toast({
+        variant: 'destructive',
+        title: 'Error generating scenario',
         description: error.message,
       });
     }
@@ -230,7 +190,39 @@ export default function DailyNewsPage() {
                   )}
                 </TabsContent>
                 <TabsContent value="hacking">
-                  <HackingPractice/>
+                  <div>
+                    <h2 className="text-xl font-bold mb-4">Hacking Practice</h2>
+                    <Button onClick={handleGenerateScenario}>Generate Practice Scenario</Button>
+
+                    {scenario && (
+                      <Card className="mt-4">
+                        <CardHeader>
+                          <CardTitle>Scenario</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <p>{scenario.scenarioDescription}</p>
+                          <Accordion type="single" collapsible className="w-full mt-4">
+                            <AccordionItem value="hints">
+                              <AccordionTrigger>Hints</AccordionTrigger>
+                              <AccordionContent>
+                                <ul>
+                                  {scenario.hints.map((hint: any, index: number) => (
+                                    <li key={index}>{hint}</li>
+                                  ))}
+                                </ul>
+                              </AccordionContent>
+                            </AccordionItem>
+                            <AccordionItem value="solution">
+                              <AccordionTrigger>Solution</AccordionTrigger>
+                              <AccordionContent>
+                                <p>{scenario.solution}</p>
+                              </AccordionContent>
+                            </AccordionItem>
+                          </Accordion>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
                 </TabsContent>
               </Tabs>
             </div>
