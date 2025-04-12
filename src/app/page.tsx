@@ -31,34 +31,56 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 
-const mockArticles: NewsArticle[] = [
-  {
-    title: 'Dark Web Market Trends',
-    url: 'https://example.com/dark-market-trends',
-    publicationDate: '2024-01-01T00:00:00.000Z',
-  },
-  {
-    title: 'New Security Breaches Discovered',
-    url: 'https://example.com/security-breaches',
-    publicationDate: '2024-01-02T00:00:00.000Z',
-  },
-];
-
 export default function DailyNewsPage() {
   const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
-  const [researchArticles, setResearchArticles] = useState<NewsArticle[]>(mockArticles);
-  const [latestArticles, setLatestArticles] = useState<NewsArticle[]>(mockArticles);
+  const [researchArticles, setResearchArticles] = useState<NewsArticle[]>([]);
+  const [latestArticles, setLatestArticles] = useState<NewsArticle[]>([]);
   const {toast} = useToast();
-  const [scenario, setScenario] = useState<any>(null);
 
   useEffect(() => {
-    const fetchArticles = async () => {
-      const fetchedArticles = await getNewsArticles('https://example.com/darkweb-news');
-      setNewsArticles(fetchedArticles);
+    const fetchNewsArticles = async () => {
+      try {
+        const fetchedArticles = await getNewsArticles('https://example.com/darkweb-news');
+        setNewsArticles(fetchedArticles);
+      } catch (error: any) {
+        toast({
+          variant: 'destructive',
+          title: 'Error fetching news articles',
+          description: error.message,
+        });
+      }
     };
 
-    fetchArticles();
-  }, []);
+    const fetchResearchArticles = async () => {
+      try {
+        const fetchedArticles = await getNewsArticles('https://example.com/research-articles');
+        setResearchArticles(fetchedArticles);
+      } catch (error: any) {
+        toast({
+          variant: 'destructive',
+          title: 'Error fetching research articles',
+          description: error.message,
+        });
+      }
+    };
+
+    const fetchLatestArticles = async () => {
+      try {
+        const fetchedArticles = await getNewsArticles('https://example.com/latest-news');
+        setLatestArticles(fetchedArticles);
+      } catch (error: any) {
+        toast({
+          variant: 'destructive',
+          title: 'Error fetching latest articles',
+          description: error.message,
+        });
+      }
+    };
+
+    fetchNewsArticles();
+    fetchResearchArticles();
+    fetchLatestArticles();
+  }, [toast]);
 
   const handleSummarizeArticle = async (article: NewsArticle) => {
     try {
@@ -73,22 +95,6 @@ export default function DailyNewsPage() {
       toast({
         variant: 'destructive',
         title: 'Error summarizing article',
-        description: error.message,
-      });
-    }
-  };
-
-  const handleGenerateScenario = async () => {
-    try {
-      const practiceScenario = await generatePracticeScenario({
-        skillLevel: 'Beginner',
-        topic: 'SQL injection',
-      });
-      setScenario(practiceScenario);
-    } catch (error: any) {
-      toast({
-        variant: 'destructive',
-        title: 'Error generating scenario',
         description: error.message,
       });
     }
@@ -190,39 +196,7 @@ export default function DailyNewsPage() {
                   )}
                 </TabsContent>
                 <TabsContent value="hacking">
-                  <div>
-                    <h2 className="text-xl font-bold mb-4">Hacking Practice</h2>
-                    <Button onClick={handleGenerateScenario}>Generate Practice Scenario</Button>
-
-                    {scenario && (
-                      <Card className="mt-4">
-                        <CardHeader>
-                          <CardTitle>Scenario</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <p>{scenario.scenarioDescription}</p>
-                          <Accordion type="single" collapsible className="w-full mt-4">
-                            <AccordionItem value="hints">
-                              <AccordionTrigger>Hints</AccordionTrigger>
-                              <AccordionContent>
-                                <ul>
-                                  {scenario.hints.map((hint: any, index: number) => (
-                                    <li key={index}>{hint}</li>
-                                  ))}
-                                </ul>
-                              </AccordionContent>
-                            </AccordionItem>
-                            <AccordionItem value="solution">
-                              <AccordionTrigger>Solution</AccordionTrigger>
-                              <AccordionContent>
-                                <p>{scenario.solution}</p>
-                              </AccordionContent>
-                            </AccordionItem>
-                          </Accordion>
-                        </CardContent>
-                      </Card>
-                    )}
-                  </div>
+                  Hacking practice content...
                 </TabsContent>
               </Tabs>
             </div>
