@@ -13,7 +13,6 @@ import {
   SidebarProvider,
   SidebarSeparator,
   SidebarTrigger,
-  SidebarInset,
 } from '@/components/ui/sidebar';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {NewsArticle} from '@/services/news-aggregator';
@@ -25,6 +24,7 @@ import {useToast} from '@/hooks/use-toast';
 import {Toaster} from '@/components/ui/toaster';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Home, Terminal} from 'lucide-react';
+import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 
 const mockArticles: NewsArticle[] = [
   {
@@ -40,14 +40,15 @@ const mockArticles: NewsArticle[] = [
 ];
 
 export default function DailyNewsPage() {
-  const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [newsArticles, setNewsArticles] = useState<NewsArticle[]>([]);
+  const [researchArticles, setResearchArticles] = useState<NewsArticle[]>(mockArticles);
+  const [latestArticles, setLatestArticles] = useState<NewsArticle[]>(mockArticles);
   const {toast} = useToast();
 
   useEffect(() => {
     const fetchArticles = async () => {
-      // Replace with actual source URL
       const fetchedArticles = await getNewsArticles('https://example.com/darkweb-news');
-      setArticles(fetchedArticles);
+      setNewsArticles(fetchedArticles);
     };
 
     fetchArticles();
@@ -55,7 +56,6 @@ export default function DailyNewsPage() {
 
   const handleSummarizeArticle = async (article: NewsArticle) => {
     try {
-      // Mock article content for summarization
       const mockArticleContent = `This is a long article about ${article.title}. It discusses various aspects of the topic in detail.`;
       const summary = await summarizeArticle({articleContent: mockArticleContent});
 
@@ -104,28 +104,72 @@ export default function DailyNewsPage() {
           </SidebarFooter>
         </Sidebar>
 
-        <SidebarInset className="flex flex-col">
+        <div className="flex flex-col flex-1">
           <ScrollArea className="flex-1">
             <div className="p-4">
               <h1 className="text-2xl font-bold mb-4">Today&apos;s DeepDive</h1>
-              {articles.length > 0 ? (
-                articles.map((article) => (
-                  <Card key={article.url} className="mb-4">
-                    <CardHeader>
-                      <CardTitle>{article.title}</CardTitle>
-                      <CardDescription>{new Date(article.publicationDate).toLocaleDateString()}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Button onClick={() => handleSummarizeArticle(article)}>Summarize</Button>
-                    </CardContent>
-                  </Card>
-                ))
-              ) : (
-                <p>Loading news articles...</p>
-              )}
+
+              <Tabs defaultValue="news" className="w-[400px]">
+                <TabsList>
+                  <TabsTrigger value="news">News</TabsTrigger>
+                  <TabsTrigger value="research">Research</TabsTrigger>
+                  <TabsTrigger value="latest">Latest News</TabsTrigger>
+                </TabsList>
+                <TabsContent value="news">
+                  {newsArticles.length > 0 ? (
+                    newsArticles.map((article) => (
+                      <Card key={article.url} className="mb-4">
+                        <CardHeader>
+                          <CardTitle>{article.title}</CardTitle>
+                          <CardDescription>{new Date(article.publicationDate).toLocaleDateString()}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Button onClick={() => handleSummarizeArticle(article)}>Summarize</Button>
+                        </CardContent>
+                      </Card>
+                    ))
+                  ) : (
+                    <p>Loading news articles...</p>
+                  )}
+                </TabsContent>
+                <TabsContent value="research">
+                  {researchArticles.length > 0 ? (
+                    researchArticles.map((article) => (
+                      <Card key={article.url} className="mb-4">
+                        <CardHeader>
+                          <CardTitle>{article.title}</CardTitle>
+                          <CardDescription>{new Date(article.publicationDate).toLocaleDateString()}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Button onClick={() => handleSummarizeArticle(article)}>Summarize</Button>
+                        </CardContent>
+                      </Card>
+                    ))
+                  ) : (
+                    <p>Loading research articles...</p>
+                  )}
+                </TabsContent>
+                <TabsContent value="latest">
+                  {latestArticles.length > 0 ? (
+                    latestArticles.map((article) => (
+                      <Card key={article.url} className="mb-4">
+                        <CardHeader>
+                          <CardTitle>{article.title}</CardTitle>
+                          <CardDescription>{new Date(article.publicationDate).toLocaleDateString()}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <Button onClick={() => handleSummarizeArticle(article)}>Summarize</Button>
+                        </CardContent>
+                      </Card>
+                    ))
+                  ) : (
+                    <p>Loading latest articles...</p>
+                  )}
+                </TabsContent>
+              </Tabs>
             </div>
           </ScrollArea>
-        </SidebarInset>
+        </div>
       </div>
       <Toaster/>
     </SidebarProvider>
